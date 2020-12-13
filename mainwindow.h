@@ -10,6 +10,9 @@
 #include <scanner.h>
 #include <QString>
 #include <QDebug>
+#include <QGroupBox>
+#include <QHBoxLayout>
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -20,7 +23,7 @@ class MainWindow : public QMainWindow
 private:
     Ui::MainWindow *ui;
     QPlainTextEdit *Input;
-    QPlainTextEdit *Output;
+    QPlainTextEdit *ScannerOutput;
     QToolBar *Toolbar;
     QSplitter *Splitter ;
     Scanner *scanner;

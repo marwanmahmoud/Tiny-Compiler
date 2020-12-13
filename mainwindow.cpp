@@ -14,12 +14,12 @@ MainWindow::MainWindow(QWidget *parent)
                                 "        x := x - 1\n"
                                 "    until x = 0;\n"
                                 "    write fact { output factorial of x }\n"
-                                "end ", this);
-    Output = new QPlainTextEdit(this);
+                                "end", this);
+    ScannerOutput = new QPlainTextEdit(this);
     Toolbar = new QToolBar(this);
     Splitter = new QSplitter(Qt::Horizontal,this);
     scanner = new Scanner();
-    Output->setReadOnly(true);
+    ScannerOutput->setReadOnly(true);
     ui->setupUi(this);
 }
 void MainWindow::init_toolbar()
@@ -27,16 +27,17 @@ void MainWindow::init_toolbar()
     this->addToolBar(Qt::TopToolBarArea,Toolbar);
     QAction * ScanAction = Toolbar->addAction("Scan");
     connect(ScanAction,SIGNAL(triggered(bool)),this,SLOT(start_Scan()));
-    //signal
-
-
-
 }
 void MainWindow::init_ui()
 {
-
-    Splitter->addWidget(Input);
-    Splitter->addWidget(Output);
+    QGroupBox *inGb = new QGroupBox("Input Program");
+    QGroupBox *scannerGb = new QGroupBox("Scanner Output");
+    inGb->setLayout(new QHBoxLayout);
+    inGb->layout()->addWidget(Input);
+    scannerGb->setLayout(new QHBoxLayout);
+    scannerGb->layout()->addWidget(ScannerOutput);
+    Splitter->addWidget(inGb);
+    Splitter->addWidget(scannerGb);
     //to appear on the main window
     this->setCentralWidget(Splitter);
 
@@ -50,6 +51,6 @@ void MainWindow::start_Scan()
 {
     QString result = this->scanner->getToken(Input->toPlainText().toStdString());
     qDebug()<<result;
-    Output->setPlainText(result);
+    ScannerOutput->setPlainText(result);
 }
 
