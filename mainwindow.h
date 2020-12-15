@@ -12,6 +12,10 @@
 #include <QDebug>
 #include <QGroupBox>
 #include <QHBoxLayout>
+#include <QDir>
+#include <QFileDialog>
+#include <QTextBrowser>
+#include <QFile>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -27,6 +31,7 @@ private:
     QToolBar *Toolbar;
     QSplitter *Splitter ;
     Scanner *scanner;
+    QPushButton *BrowseButton ;
 public:
     MainWindow(QWidget *parent = nullptr);
     void init_toolbar(void);
@@ -34,6 +39,6 @@ public:
     ~MainWindow();
 public slots:
     void start_Scan();
-
+    void browse();
 };
 #endif // MAINWINDOW_H

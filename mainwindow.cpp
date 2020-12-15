@@ -19,12 +19,15 @@ MainWindow::MainWindow(QWidget *parent)
     Toolbar = new QToolBar(this);
     Splitter = new QSplitter(Qt::Horizontal,this);
     scanner = new Scanner();
+    //BrowseButton = new QPushButton(tr("Browse"), this);
     ScannerOutput->setReadOnly(true);
     ui->setupUi(this);
 }
 void MainWindow::init_toolbar()
 {
     this->addToolBar(Qt::TopToolBarArea,Toolbar);
+    QAction * BrowseAction = Toolbar->addAction("Browse");
+    connect(BrowseAction,SIGNAL(triggered(bool)),this,SLOT(browse()));
     QAction * ScanAction = Toolbar->addAction("Scan");
     connect(ScanAction,SIGNAL(triggered(bool)),this,SLOT(start_Scan()));
 }
@@ -40,17 +43,23 @@ void MainWindow::init_ui()
     Splitter->addWidget(scannerGb);
     //to appear on the main window
     this->setCentralWidget(Splitter);
-
 }
 MainWindow::~MainWindow()
 {
     delete ui;
 }
-
 void MainWindow::start_Scan()
 {
     QString result = this->scanner->getToken(Input->toPlainText().toStdString());
     qDebug()<<result;
     ScannerOutput->setPlainText(result);
 }
+void MainWindow::browse()
+{
+    QString directory = QFileDialog::getOpenFileName(this, tr("Browsig Files"),
+                                                    "QDir::currentPath()",
+                                                    tr("Text (*.txt)"));
+    QString result = this->scanner->getStringFile(directory);
+    Input->setPlainText(result);
 
+}
