@@ -2,6 +2,22 @@
 Scanner::Scanner()
 {
 }
+QString Scanner::getStringFile(QString directory)
+{
+    QFile file(directory);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+    }
+    QString input;
+    QTextStream in(&file);
+    QString line = in.readLine();
+    while (!line.isNull()) {
+        input += line ;
+        line = in.readLine();
+        input += "\n";
+    }
+    return (input);
+}
 QString Scanner::getToken(string l)
 {
     QString result = "";

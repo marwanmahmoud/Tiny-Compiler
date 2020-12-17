@@ -5,6 +5,7 @@
 #include <fstream>
 #include <QString>
 #include <QDebug>
+#include <QFile>
 using namespace std;
 enum DFAstates {
     START,
@@ -14,9 +15,6 @@ enum DFAstates {
     INASSIGN,
     DONE
 };
-
-
-
 class Scanner
 {
 private:
@@ -26,11 +24,10 @@ private:
 public:
     Scanner();
     QString getToken(string);
+    QString getStringFile(QString directory);
     bool isDigit(char);
     bool isLetter(char);
     bool isSpace(char);
     bool isSymbol(char);
-
 };
-
 #endif // SCANNER_H
