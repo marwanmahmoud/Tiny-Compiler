@@ -8,6 +8,7 @@
 #include <Qt>
 #include <QSplitter>
 #include <scanner.h>
+#include <parser.h>
 #include <QString>
 #include <QDebug>
 #include <QGroupBox>
@@ -16,7 +17,7 @@
 #include <QFileDialog>
 #include <QTextBrowser>
 #include <QFile>
-
+#include "parsetree.h"
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -32,6 +33,8 @@ private:
     QSplitter *Splitter ;
     Scanner *scanner;
     QPushButton *BrowseButton ;
+    Parser parser;
+    ParseTree *parsetree;
 public:
     MainWindow(QWidget *parent = nullptr);
     void init_toolbar(void);
@@ -40,5 +43,6 @@ public:
 public slots:
     void start_Scan();
     void browse();
+    void parse();
 };
 #endif // MAINWINDOW_H

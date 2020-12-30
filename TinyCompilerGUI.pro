@@ -11,10 +11,14 @@ CONFIG += c++11
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
+    parser.cpp \
+    parsetree.cpp \
     scanner.cpp
 
 HEADERS += \
     mainwindow.h \
+    parser.h \
+    parsetree.h \
     scanner.h
 
 FORMS += \
