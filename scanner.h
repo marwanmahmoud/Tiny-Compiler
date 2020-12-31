@@ -13,6 +13,7 @@ enum DFAstates {
     INNUM,
     INID,
     INASSIGN,
+    OP,
     DONE
 };
 class Scanner
@@ -29,5 +30,6 @@ public:
     bool isLetter(char);
     bool isSpace(char);
     bool isSymbol(char);
+    bool isOp(char);
 };
 #endif // SCANNER_H

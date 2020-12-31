@@ -93,7 +93,6 @@ void  Parser::stmt()
         assign_stmt();
         break;
     case ERROR:
-
         cout << "no stmt found\n";
         //exit(1);
         break;
@@ -324,18 +323,19 @@ void Parser:: factor(int x,int y)
 
 void Parser::_3bas(QString s2)
 {
-    s2 = getStringFile("/media/sf_C_DRIVE/Users/moham/QT/Tiny-Compiler/parser_input.txt");
-//    s2 = input_preprocessing(s2);
-    qDebug() << s2;
+    //s2 = getStringFile("/home/mogz/Desktop/Tiny-Compiler/parser_input.txt");//media/sf_C_DRIVE/Users/moham/QT/Tiny-Compiler/parser_input.txt
+    //s2 = input_preprocessing(s2);
+    //qDebug() << s2;
     tokens = s2.split(QRegExp("\n"));
     token =  tokens[token_index].toStdString();
     token_index++;
     program();
     process_edges();
-    file.close();
+    //file.close();
 }
 
 QString Parser::input_preprocessing(QString s2){
+
     return s2;
 }
 
@@ -389,8 +389,12 @@ QVector<Node> Parser::get_nodes()
 {
     return Nodes;
 }
-
 QVector<Edge> Parser::get_edges()
 {
     return Edges;
+}
+
+void Parser::setTokenIndex(int x)
+{
+    token_index =x;
 }
