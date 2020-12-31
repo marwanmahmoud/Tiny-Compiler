@@ -26,6 +26,7 @@ QString Scanner::getToken(string l)
         return "";
     bool res_flag = 0;
     int i = 0;
+    QString x;
     while (state != DONE)
     {
         switch (state)
@@ -61,6 +62,31 @@ QString Scanner::getToken(string l)
                 switch (l[i])
                 {
                 case ';':
+                    result +=";,SEMICOLON\n";
+                    break;
+                case '(':
+                    result +="(,OPENBRACKET\n";
+                    break;
+                case ')':
+                    result +="),CLOSEDBRACKET\n";
+                    break;
+                case '+':
+                     result +="+,ADD\n";
+                    break;
+                case '-':
+                     result +="-,MINUS\n";
+                    break;
+                case '/':
+                     result +="/,DIV\n";
+                    break;
+                case '*':
+                     result +="*,MULT\n";
+                    break;
+                case '=':
+                     result +="=,EQUAL\n";
+                    break;
+                case '<':
+                    result +="<,LESSTHAN\n";
                     break;
                 default:
                     qDebug() << l[i] << " , Symbol \n ";
@@ -90,41 +116,42 @@ QString Scanner::getToken(string l)
                     state = START;
             }
             break;
-
         case INNUM:
             while (isDigit(l[i]))
             {
                 mytoken += l[i];
                 i++;
             }
-            result += QString::fromStdString(mytoken) + " ,number\n";
-
+            result += QString::fromStdString(mytoken) + ",NUMBER\n";
             mytoken = "";
             if (i == l.length())
                 state = DONE;
             else
                 state = START;
             break;
-
         case INID:
             while (isLetter(l[i]))
             {
                 mytoken += l[i];
                 i++;
             }
+
             for (int i = 0; i < 8; i++)
             {
                 if (RES_WORDS[i] == mytoken)
+                {
                     res_flag = 1;
+                    x = QString::fromStdString(RES_WORDS[i]).toUpper();
+                }
             }
             if (res_flag)
             {
-                result += QString::fromStdString(mytoken) + " ,Reserved word\n";
+                result += QString::fromStdString(mytoken) + ","+x+"\n";
 
             }
             else
             {
-                result +=  QString::fromStdString(mytoken) + " ,identifier\n";
+                result +=  QString::fromStdString(mytoken) + ",IDENTIFIER\n";
 
             }
             mytoken = "";
@@ -134,13 +161,11 @@ QString Scanner::getToken(string l)
             else
                 state = START;
             break;
-
         case INASSIGN:
             if (l[i] == ':')
             {
                 i += 2;
-                result +=  ":= , assign\n";
-
+                result +=  ":=,ASSIGN\n";
                 state = START;
             }
             else
@@ -165,4 +190,5 @@ bool Scanner::isLetter(char l) { return (l >= 'a' && l <= 'z' || l >= 'A' && l <
 
 bool Scanner::isSpace(char s) { return (s == ' ' || s == '\t' || s == '\n'); }
 
-bool Scanner::isSymbol(char c) { return (c == '+' || '-' || '*' || '/' || '=' || '<' || '(' || ')' || ';'); }
+bool Scanner::isSymbol(char c) { return (c == '+' || '-' || '*' || '=' || '<' || '/' || '(' || ')' || ';'); }
+

@@ -5,7 +5,7 @@
 #include <string>
 #include <fstream>
 #include "QString"
-#include "QVector"
+#include "scanner.h"
 using namespace std;
 enum stmtTypes {IF, REPEAT, ASSIGN, READ, WRITE, ERROR};
 typedef struct{
@@ -68,6 +68,7 @@ public:
     QString input_preprocessing(QString s2);
     QVector<Node> get_nodes();
     QVector<Edge> get_edges();
+    void setTokenIndex(int x);
 };
 
 #endif // PARSER_H

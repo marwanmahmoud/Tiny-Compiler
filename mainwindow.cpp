@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
     parsetree =new ParseTree();
 
     //BrowseButton = new QPushButton(tr("Browse"), this);
-    ScannerOutput->setReadOnly(true);
+    //ScannerOutput->setReadOnly(true);
     ui->setupUi(this);
 }
 void MainWindow::init_toolbar()
@@ -42,7 +42,6 @@ void MainWindow::init_ui()
     QGroupBox *inGb = new QGroupBox("Input Program");
     QGroupBox *scannerGb = new QGroupBox("Scanner Output");
     QGroupBox *parseTreeGb = new QGroupBox("Parse Tree");
-
     inGb->setLayout(new QHBoxLayout);
     inGb->layout()->addWidget(Input);
     scannerGb->setLayout(new QHBoxLayout);
@@ -73,14 +72,14 @@ void MainWindow::browse()
     QString directory = QFileDialog::getOpenFileName(this, tr("Browsig Files"),
                                                     "QDir::currentPath()",
                                                     tr("Text (*.txt)"));
-    if(directory == "")
-        return;
     QString result = this->scanner->getStringFile(directory);
     Input->setPlainText(result);
 
 }
 void MainWindow::parse()
 {
+    parsetree->clearTree();
+    parser.setTokenIndex(0);
     parser._3bas(ScannerOutput->toPlainText());
     QVector<Node> nodes = parser.get_nodes();
     QVector<Edge> edges = parser.get_edges();

@@ -18,7 +18,7 @@ public:
     QGraphicsEllipseItem* addEllipseNode(int x,int y,QString text);
     QGraphicsLineItem *addEdgeChild(int x1,int y1,int x2,int y2);
     QGraphicsLineItem *addEdgeFriend(int x1,int y1,int x2,int y2);
-
+    void clearTree(void);
 
 signals:
 
