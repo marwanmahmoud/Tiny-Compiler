@@ -90,9 +90,12 @@ void  Parser::if_stmt()
 {
     match("if,IF");
     cout << "if" << " -> ";
-    pre_update_edge();
+    if (currentEdge != NULL){
+        currentEdge->x2 = currentx;
+        currentEdge.y2 = currenty;
+        Edges.append(*currentEdge);
+    }
     Nodes.append({true,currentx,currenty,"if"});
-    post_update_edge(false);
     currenty+=100;
     exp();
     match("then,THEN");
@@ -104,23 +107,20 @@ void  Parser::if_stmt()
     cout << "- if statement found" << endl;
     currenty -=100;
     currentx -=150;
-
 }
 
 // repeat-stmt -> repeat stmt-seq until exp
 void  Parser::repeat_stmt()
 {
     match("repeat,REPEAT");
-    pre_update_edge();
     Nodes.append({true,currentx,currenty,"repeat"});
-    post_update_edge(false);
     currenty+=100;
     cout << "repeat - > ";
     stmt_seq();
     cout << "\n     ->";
     match("until,UNTIL");
-    exp();
     currentx +=150;
+    exp();
     cout << "- repeat found" << endl;
     currenty -=100;
 //    currentx -=150;
@@ -129,9 +129,7 @@ void  Parser::repeat_stmt()
 // assign-stmt -> identifier := exp
 void  Parser::assign_stmt()
 {
-    pre_update_edge();
     Nodes.append({true,currentx,currenty,"assign\n   "+token.substr(0, token.find(","))});
-    post_update_edge(false);
     cout << "assign ";
     cout << token.substr(0, token.find(",")) << " -> ";
     match(token.substr(0, token.find(",")) + ",IDENTIFIER");
@@ -145,9 +143,7 @@ void  Parser::assign_stmt()
 // read-stmt -> read identifier
 void  Parser::read_stmt()
 {
-    pre_update_edge();
     Nodes.append({true,currentx,currenty,"read\n"});
-    post_update_edge(true);
     currentx += 150;
     match("read,READ");
     cout << "read -> ";
@@ -160,9 +156,7 @@ void  Parser::read_stmt()
 // write-stmt -> write exp
 void  Parser::write_stmt()
 {
-    pre_update_edge();
     Nodes.append({true, currentx, currenty, "write"});
-    post_update_edge(false);
 //    currenty +=100;
     match("write,WRITE");
     cout << "write -> ";
@@ -202,17 +196,13 @@ void  Parser::comparison_op()
 {
     if (token == "<,LESSTHAN")
     {
-        pre_update_edge();
-        Nodes.append({false, currentx, currenty, "op\n(<)"});
-        post_update_edge(false);
+        Nodes.append({false,currentx,currenty,"op\n(<)"});
         match("<,LESSTHAN");
         cout << " < -> ";
     }
     if (token == "=,EQUAL")
     {
-        pre_update_edge();
         Nodes.append({false,currentx,currenty,"op\n(=)"});
-        post_update_edge(false);
         match("=,EQUAL");
         cout << " = -> ";
     }
@@ -221,17 +211,8 @@ void  Parser::comparison_op()
 // simple-exp -> term { addop term }
 void  Parser::simple_exp()
 {
-//    string s;
-//    string s2;
-//    file >> s;
-//    if(s == "+,PLUS" || s == "-,MINUS")
-//        currenty +=100;
-//    ofstream file2;
-//    file2.open("/media/sf_C_DRIVE/Users/moham/QT/Tiny-Compiler/parser_input.txt");
-//    getline(file,s2 );
-//    s = s+s2;
-//    file2 << s;
-    currenty += 100;
+
+    currenty +=100;
     term();
     while (token == "+,PLUS" || token == "-,MINUS")
     {
@@ -261,17 +242,13 @@ void  Parser::addop()
 {
     if (token == "+,PLUS")
     {
-        pre_update_edge();
         Nodes.append({false,currentx,currenty,"op\n(+)"});
-        post_update_edge(false);
         match("+,PLUS");
         cout << " + -> ";
     }
     if (token == "-,MINUS")
     {
-        pre_update_edge();
         Nodes.append({false,currentx,currenty,"op\n(-)"});
-        post_update_edge(false);
         match("-,MINUS");
         cout << " - -> ";
     }
@@ -280,6 +257,7 @@ void  Parser::addop()
 // term -> factor { mulop factor }
 void  Parser::term()
 {
+
     currenty+=100;
     factor();
     while (token == "*,MULT" || token == "/,DIV")
@@ -308,19 +286,13 @@ void  Parser::mulop()
 {
     if (token == "*,MULT")
     {
-        currenty -= 100;
-        pre_update_edge();
         Nodes.append({false,currentx,currenty,"op\n(*)"});
-        post_update_edge(false);
-        currenty += 100;
         match("*,MULT");
         cout << " * -> ";
     }
     if (token == "/,DIV")
     {
-        pre_update_edge();
         Nodes.append({false,currentx,currenty,"op\n(/)"});
-        post_update_edge(false);
         match("/,DIV");
         cout << " / -> ";
     }
@@ -338,14 +310,12 @@ void Parser:: factor()
     }
     else if (token.substr(token.find(",") + 1, token.length() -1) == "NUMBER")
     {
-        pre_update_edge();
         Nodes.append({false,currentx,currenty,"NUMBER\n"+token.substr(0, token.find(","))});
         cout << token.substr(0, token.find(",")) << " -> ";
         match(token.substr(0, token.find(",")) + ",NUMBER");
     }
     else if (token.substr(token.find(",") + 1, token.length() - token.find(",") + 1) == "IDENTIFIER")
     {
-        pre_update_edge();
         Nodes.append({false,currentx,currenty,"IDENTIFIER\n"+token.substr(0, token.find(","))});
         //currenty -=100;
         cout << token.substr(0, token.find(",")) << " -> ";
@@ -360,40 +330,8 @@ void Parser::_3bas()
     file >> token;
     cout << token ;
     program();
-    process_edges();
+
     file.close();
-}
-
-void Parser::process_edges(){
-    int len = Nodes.length();
-    for(int i = 0; i < len; i++){
-        for(int j = 0; j < len; j++){
-            if (j != i){
-                if(Nodes[i].Rect && Nodes[j].Rect)
-                    if(Nodes[i].y == Nodes[j].y)
-                        if((Nodes[i].x - Nodes[j].x) == 150)
-                            Edges.append({true, Nodes[j].x, Nodes[j].y, Nodes[i].x, Nodes[i].y});
-                        else if((Nodes[j].x - Nodes[i].x) == 150)
-                            Edges.append({true, Nodes[i].x, Nodes[i].y, Nodes[j].x, Nodes[j].y});
-            }
-        }
-    }
-}
-
-void Parser::pre_update_edge(){
-    if (currentEdge != NULL){
-        currentEdge->x2 = currentx;
-        currentEdge->y2 = currenty;
-        Edges.append(*currentEdge);
-        currentEdge = NULL;
-    }
-}
-
-void Parser::post_update_edge(bool isFriend){
-    currentEdge = new Edge;
-    currentEdge->isFriend = isFriend;
-    currentEdge->x1 = currentx;
-    currentEdge->y1 = currenty;
 }
 
 QVector<Node> Parser::get_nodes()

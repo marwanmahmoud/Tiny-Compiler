@@ -12,7 +12,6 @@ typedef struct{
     int x;
     int y;
     string text;
-    int parent;
 }Node;
 typedef struct{
     bool isFriend;
@@ -21,11 +20,6 @@ typedef struct{
     int x2;
     int y2;
 }Edge;
-typedef struct{
-    bool isFriend;
-    int x;
-    int y;
-}parentNode;
 class Parser
 {
 private:
@@ -36,8 +30,6 @@ private:
     Edge *currentEdge = NULL;
     int currentx=0;
     int currenty=0;
-    QVector<parentNode> parentNodes;
-    int counter = 0;
 public:
     Parser();
     stmtTypes getStmtType(string s);
@@ -57,10 +49,8 @@ public:
     void term();
     void mulop();
     void factor();
-    void pre_update_edge();
-    void post_update_edge(bool isFriend);
+    void pre();
     void _3bas();
-    void process_edges();
     QVector<Node> get_nodes();
     QVector<Edge> get_edges();
 };

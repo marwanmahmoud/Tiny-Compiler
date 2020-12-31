@@ -17,6 +17,7 @@
 #include <QFileDialog>
 #include <QTextBrowser>
 #include <QFile>
+#include <QDebug>
 #include "parsetree.h"
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

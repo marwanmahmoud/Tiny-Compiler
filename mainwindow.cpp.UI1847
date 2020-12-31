@@ -79,17 +79,17 @@ void MainWindow::parse()
     parser._3bas();
     QVector<Node> nodes = parser.get_nodes();
     QVector<Edge> edges = parser.get_edges();
-    for(auto edge: edges){
-        if(edge.isFriend)
-            parsetree->addEdgeFriend(edge.x1, edge.y1, edge.x2, edge.y2);
-        else if(!edge.isFriend)
-            parsetree->addEdgeChild(edge.x1, edge.y1, edge.x2, edge.y2);
-    }
     for(auto node: nodes){
         if (node.Rect)
             parsetree->addRectangleNode(node.x, node.y, QString::fromStdString(node.text));
         if(!node.Rect)
             parsetree->addEllipseNode(node.x, node.y, QString::fromStdString(node.text));
         qDebug() << QString::fromStdString(node.text) << "\n";
+    }
+    for(auto edge: edges){
+        if(edge.isFriend)
+            parsetree->addEdgeFriend(edge.x1, edge.y1, edge.x2, edge.y2);
+        else if(!edge.isFriend)
+            parsetree->addEdgeChild(edge.x1, edge.y1, edge.x2, edge.y2);
     }
 }

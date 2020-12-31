@@ -24,6 +24,7 @@ QGraphicsRectItem* ParseTree::addRectangleNode(int x, int y,QString text)
      QGraphicsProxyWidget *pMyProxy = new QGraphicsProxyWidget(item);
      QLabel *label = new QLabel();
      label->setText(text);
+     label->setStyleSheet("background-color: #ffffff");
      pMyProxy->setWidget(label);
      pMyProxy->setPos(item->boundingRect().center()-label->rect().center());
      return item;
@@ -31,10 +32,12 @@ QGraphicsRectItem* ParseTree::addRectangleNode(int x, int y,QString text)
 QGraphicsEllipseItem* ParseTree::addEllipseNode(int x, int y, QString text)
 {
     QGraphicsEllipseItem* item = new QGraphicsEllipseItem(x,y,100,50);
+    item->setBrush(QBrush(Qt::white));
     scene->addItem(item);
     QGraphicsProxyWidget *pMyProxy = new QGraphicsProxyWidget(item);
     QLabel *label = new QLabel();
     label->setText(text);
+    label->setStyleSheet("background-color: #ffffff");
     pMyProxy->setWidget(label);
     pMyProxy->setPos(item->boundingRect().center()-label->rect().center());
     return item;
