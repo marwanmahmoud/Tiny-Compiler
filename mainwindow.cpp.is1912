@@ -47,11 +47,9 @@ void MainWindow::init_ui()
     inGb->layout()->addWidget(Input);
     scannerGb->setLayout(new QHBoxLayout);
     scannerGb->layout()->addWidget(ScannerOutput);
-    parseTreeGb->setLayout(new QHBoxLayout);
-    parseTreeGb->layout()->addWidget(parsetree);
     Splitter->addWidget(inGb);
     Splitter->addWidget(scannerGb);
-    Splitter->addWidget(parseTreeGb);
+    Splitter->addWidget(parsetree);
     //to appear on the main window
     this->setCentralWidget(Splitter);
     QList<int> sizes;

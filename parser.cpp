@@ -335,7 +335,7 @@ void Parser::_3bas(QString s2)
     file.close();
 }
 
-void Parser::input_preprocessing(QString s2){
+QString Parser::input_preprocessing(QString s2){
     return s2;
 }
 
