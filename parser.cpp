@@ -1,10 +1,26 @@
 #include "parser.h"
 #include "QDebug"
+#include "QFile"
 Parser::Parser()
 {
 
 }
-int c =0;
+QString Parser::getStringFile(QString directory)
+{
+    QFile file(directory);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+    }
+    QString input;
+    QTextStream in(&file);
+    QString line = in.readLine();
+    while (!line.isNull()) {
+        input += line ;
+        line = in.readLine();
+        input += "\n";
+    }
+    return (input);
+}
 stmtTypes Parser::getStmtType(string s)
 {
     s = s.substr(s.find(",") + 1, s.length() - s.find(",")+1);
@@ -29,7 +45,8 @@ void  Parser::match(string s)
 {
     if (s == token)
     {
-        file >> token;
+        token =  tokens[token_index].toStdString();
+        token_index++;
     }
     else
     {
@@ -89,22 +106,23 @@ void  Parser::stmt()
 void  Parser::if_stmt()
 {
     match("if,IF");
-    cout << "if" << " -> ";
     pre_update_edge();
     Nodes.append({true,currentx,currenty,"if"});
     post_update_edge(false);
-    currenty+=100;
+
+    currenty+=100;//child y
     exp();
+    currenty-=100;//parent y
     match("then,THEN");
-    currentx += 150;
+
+    currentx += 150;//child2 x
+    currenty += 100;//child y
     stmt_seq();
+    currenty -= 100;//parent y
     if (token == "else,ELSE")
         stmt_seq();
     match("end,END");
-    cout << "- if statement found" << endl;
-    currenty -=100;
-    currentx -=150;
-
+    currentx +=150;//friend x;
 }
 
 // repeat-stmt -> repeat stmt-seq until exp
@@ -114,16 +132,17 @@ void  Parser::repeat_stmt()
     pre_update_edge();
     Nodes.append({true,currentx,currenty,"repeat"});
     post_update_edge(false);
-    currenty+=100;
-    cout << "repeat - > ";
+
+    currenty+=100;//child y
     stmt_seq();
-    cout << "\n     ->";
+    currenty-=100;//parent y
     match("until,UNTIL");
+
+    currenty +=100 ;//child y
     exp();
-    currentx +=150;
+    currenty -= 100;//parent y
     cout << "- repeat found" << endl;
-    currenty -=100;
-//    currentx -=150;
+    currentx +=150; //friend x
 }
 
 // assign-stmt -> identifier := exp
@@ -132,14 +151,12 @@ void  Parser::assign_stmt()
     pre_update_edge();
     Nodes.append({true,currentx,currenty,"assign\n   "+token.substr(0, token.find(","))});
     post_update_edge(false);
-    cout << "assign ";
-    cout << token.substr(0, token.find(",")) << " -> ";
     match(token.substr(0, token.find(",")) + ",IDENTIFIER");
     match(":=,ASSIGN");
+    currenty +=100;//child y
     exp();
-    cout << "\n";
-    cout << "- assignment found" << endl;
-    currentx +=150;
+    currenty -=100;//parent y
+    currentx +=150;//friend x;
 }
 
 // read-stmt -> read identifier
@@ -148,13 +165,10 @@ void  Parser::read_stmt()
     pre_update_edge();
     Nodes.append({true,currentx,currenty,"read\n"});
     post_update_edge(true);
-    currentx += 150;
     match("read,READ");
-    cout << "read -> ";
-    cout << token.substr(0, token.find(",")) << "\n";
     token.erase(0, token.find(",") + 1);
     match("IDENTIFIER");
-    cout << "- read found" << endl;
+    currentx += 150;//friend x
 }
 
 // write-stmt -> write exp
@@ -163,38 +177,27 @@ void  Parser::write_stmt()
     pre_update_edge();
     Nodes.append({true, currentx, currenty, "write"});
     post_update_edge(false);
-//    currenty +=100;
     match("write,WRITE");
-    cout << "write -> ";
+    currenty +=100;//child y
     exp();
-    cout << "\n";
-    cout << "- write found" << endl;
-//    currenty -=100;
+    currenty -=100;//parent y
+    currentx +=150;//friend x;
 }
 // exp -> simple-exp [comparison-op simple-exp]
 void  Parser::exp()
-{
-    c=0;
-    currenty +=100;
+{    
+    if(tokens[token_index] == "<,LESSTHAN" || tokens[token_index] == "=,EQUAL")
+       currenty+=100;
     simple_exp();
     if (token == "<,LESSTHAN" || token == "=,EQUAL")
     {
-        currenty -= 100;
+        currenty -= 100; //parenty
         comparison_op();
-        currenty +=100;
-        currentx += 150;
+        currenty +=100; //child y
+        currentx += 150; //child x
         simple_exp();
-        Node tmp1 = Nodes.back();
-        Nodes.pop_back();
-        Node tmp2 = Nodes.back();
-        Nodes.pop_back();
-        Node tmp3 = Nodes.back();
-        Nodes.pop_back();
-        Nodes.push_back(tmp2);
-        Nodes.push_back(tmp1);
-        Nodes.push_back(tmp3);
+        currenty -=100;//parent y
     }
-    currenty -= 100;
 }
 
 // comparison-op -> < | =
@@ -206,7 +209,6 @@ void  Parser::comparison_op()
         Nodes.append({false, currentx, currenty, "op\n(<)"});
         post_update_edge(false);
         match("<,LESSTHAN");
-        cout << " < -> ";
     }
     if (token == "=,EQUAL")
     {
@@ -214,48 +216,25 @@ void  Parser::comparison_op()
         Nodes.append({false,currentx,currenty,"op\n(=)"});
         post_update_edge(false);
         match("=,EQUAL");
-        cout << " = -> ";
     }
 }
 
 // simple-exp -> term { addop term }
 void  Parser::simple_exp()
 {
-//    string s;
-//    string s2;
-//    file >> s;
-//    if(s == "+,PLUS" || s == "-,MINUS")
-//        currenty +=100;
-//    ofstream file2;
-//    file2.open("/media/sf_C_DRIVE/Users/moham/QT/Tiny-Compiler/parser_input.txt");
-//    getline(file,s2 );
-//    s = s+s2;
-//    file2 << s;
-    currenty += 100;
+    if(tokens[token_index] == "+,PLUS"  || tokens[token_index] =="-,MINUS")
+       currenty+=100;
     term();
     while (token == "+,PLUS" || token == "-,MINUS")
     {
-        c++;
-        currenty -= 100;
+        currenty -= 100; //parenty
         addop();
-        currenty +=100;
-        currentx += 150;
+        currenty +=100; //child y
+        currentx += 150; //child x
         term();
-        Node tmp1 = Nodes.back();
-        Nodes.pop_back();
-        Node tmp2 = Nodes.back();
-        Nodes.pop_back();
-        Node tmp3 = Nodes.back();
-        Nodes.pop_back();
-        Nodes.push_back(tmp2);
-        Nodes.push_back(tmp1);
-        Nodes.push_back(tmp3);
+        currenty -=100;//parent y
     }
-    currenty -= 100;
-
 }
-
-
 // addop -> + | -
 void  Parser::addop()
 {
@@ -280,39 +259,29 @@ void  Parser::addop()
 // term -> factor { mulop factor }
 void  Parser::term()
 {
-    currenty+=100;
-    factor();
+    if(tokens[token_index] == "*,MULT"  || tokens[token_index] == "/,DIV")
+       currenty+=100;
+    factor(currentx,currenty-100);
     while (token == "*,MULT" || token == "/,DIV")
     {
-        c++;
-        currenty-=100;
-        mulop();
-        currenty +=100;
-        currentx += 150;
-        factor();
-        Node tmp1 = Nodes.back();
-        Nodes.pop_back();
-        Node tmp2 = Nodes.back();
-        Nodes.pop_back();
-        Node tmp3 = Nodes.back();
-        Nodes.pop_back();
-        Nodes.push_back(tmp2);
-        Nodes.push_back(tmp1);
-        Nodes.push_back(tmp3);
-    }
-    currenty -= 100;
-}
 
+        currenty -= 100; //parenty
+         mulop();
+        currenty +=100; //child y
+        currentx += 150; //child x
+        factor(currentx-150,currenty-100);
+        currenty -=100;//parent y
+    }
+
+}
 // mulop -> * | /
 void  Parser::mulop()
 {
     if (token == "*,MULT")
     {
-        currenty -= 100;
         pre_update_edge();
         Nodes.append({false,currentx,currenty,"op\n(*)"});
         post_update_edge(false);
-        currenty += 100;
         match("*,MULT");
         cout << " * -> ";
     }
@@ -327,7 +296,7 @@ void  Parser::mulop()
 }
 
 // factor -> (exp) | number | identifier
-void Parser:: factor()
+void Parser:: factor(int x,int y)
 {
 
     if (token == "(")
@@ -340,25 +309,26 @@ void Parser:: factor()
     {
         pre_update_edge();
         Nodes.append({false,currentx,currenty,"NUMBER\n"+token.substr(0, token.find(","))});
-        cout << token.substr(0, token.find(",")) << " -> ";
         match(token.substr(0, token.find(",")) + ",NUMBER");
+        //Edges.push_back({false,currentx,currenty,x,y});
+
     }
     else if (token.substr(token.find(",") + 1, token.length() - token.find(",") + 1) == "IDENTIFIER")
     {
         pre_update_edge();
         Nodes.append({false,currentx,currenty,"IDENTIFIER\n"+token.substr(0, token.find(","))});
-        //currenty -=100;
-        cout << token.substr(0, token.find(",")) << " -> ";
         match(token.substr(0, token.find(",")) + ",IDENTIFIER");
+        //Edges.push_back({false,currentx,currenty,x,y});
     }
 }
 
 void Parser::_3bas()
 {
-    file.open("/media/sf_C_DRIVE/Users/moham/QT/Tiny-Compiler/parser_input.txt");
-
-    file >> token;
-    cout << token ;
+    QString s2 = getStringFile("/home/mogz/Desktop/Tiny-Compiler/parser_input.txt");
+    qDebug() << s2;
+    tokens = s2.split(QRegExp("\n"));
+    token =  tokens[token_index].toStdString();
+    token_index++;
     program();
     process_edges();
     file.close();
