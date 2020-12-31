@@ -322,10 +322,9 @@ void Parser:: factor(int x,int y)
     }
 }
 
-void Parser::_3bas(QString s2)
+void Parser::_3bas()
 {
-    s2 = getStringFile("/media/sf_C_DRIVE/Users/moham/QT/Tiny-Compiler/parser_input.txt");
-//    s2 = input_preprocessing(s2);
+    QString s2 = getStringFile("/media/sf_C_DRIVE/Users/moham/QT/Tiny-Compiler/parser_input.txt");
     qDebug() << s2;
     tokens = s2.split(QRegExp("\n"));
     token =  tokens[token_index].toStdString();
@@ -335,37 +334,23 @@ void Parser::_3bas(QString s2)
     file.close();
 }
 
-void Parser::input_preprocessing(QString s2){
-    return s2;
-}
-
 void Parser::process_edges(){
     int len = Nodes.length();
     for(int i = 0; i < len; i++){
-        bool flag = false;
-        int minIndex = 0;
+        int minIndex = (i + 1) % len;
         for(int j = 0; j < len; j++){
             if (j != i){
-                if(Nodes[i].Rect && Nodes[j].Rect && Nodes[i].y == Nodes[j].y && Nodes[i].x > Nodes[j].x){
-                    if(!flag){
+                if(Nodes[i].Rect && Nodes[j].Rect && Nodes[i].y == Nodes[j].y){
+                    if((Nodes[i].x - Nodes[j].x) < (Nodes[i].x - Nodes[minIndex]))
                         minIndex = j;
-                        flag = true;
-                    }
-                    if((Nodes[i].x - Nodes[j].x) < (Nodes[i].x - Nodes[minIndex].x))
-                        minIndex = j;
-                }
-                if(!Nodes[i].Rect && !Nodes[j].Rect && Nodes[i].x == Nodes[j].x && Nodes[i].y - Nodes[j].y == 100)
-                    Edges.append({false, Nodes[j].x, Nodes[j].y, Nodes[i].x, Nodes[i].y});
-                if(Nodes[i].text == "if" && Nodes[j].x - Nodes[i].x == 300 && Nodes[j].y - Nodes[i].y == 100)
-                    Edges.append({false, Nodes[i].x, Nodes[i].y, Nodes[j].x, Nodes[j].y});
-                if(Nodes[i].text == "repeat" && Nodes[j].y - Nodes[i].y == 100
-                        && Nodes[j].x > Nodes[i].x && !Nodes[j].Rect && Nodes[j].text.substr(0, 2) == "op"){
-                    Edges.append({false, Nodes[i].x, Nodes[i].y, Nodes[j].x, Nodes[j].y});
+                    if((Nodes[i].x - Nodes[j].x) == 150)
+                        Edges.append({true, Nodes[j].x, Nodes[j].y, Nodes[i].x, Nodes[i].y});
+                    else if((Nodes[j].x - Nodes[i].x) == 150)
+                        Edges.append({true, Nodes[i].x, Nodes[i].y, Nodes[j].x, Nodes[j].y});
                 }
             }
         }
-        if(flag)
-            Edges.append({true, Nodes[minIndex].x, Nodes[minIndex].y, Nodes[i].x, Nodes[i].y});
+        Edges.append({true, Nodes[minIndex].x, Nodes[minIndex].y, Nodes[i].x, Nodes[i].y});
     }
 }
 

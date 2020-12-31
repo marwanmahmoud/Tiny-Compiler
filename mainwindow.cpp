@@ -76,7 +76,7 @@ void MainWindow::browse()
 }
 void MainWindow::parse()
 {
-    parser._3bas();
+    parser._3bas(ScannerOutput->toPlainText());
     QVector<Node> nodes = parser.get_nodes();
     QVector<Edge> edges = parser.get_edges();
     for(auto edge: edges){

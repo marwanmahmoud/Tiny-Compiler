@@ -65,6 +65,7 @@ public:
     void post_update_edge(bool isFriend);
     void _3bas(QString s2);
     void process_edges();
+    QString input_preprocessing(QString s2);
     QVector<Node> get_nodes();
     QVector<Edge> get_edges();
 };
