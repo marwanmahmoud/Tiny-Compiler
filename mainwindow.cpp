@@ -73,6 +73,8 @@ void MainWindow::browse()
     QString directory = QFileDialog::getOpenFileName(this, tr("Browsig Files"),
                                                     "QDir::currentPath()",
                                                     tr("Text (*.txt)"));
+    if(directory == "")
+        return;
     QString result = this->scanner->getStringFile(directory);
     Input->setPlainText(result);
 
