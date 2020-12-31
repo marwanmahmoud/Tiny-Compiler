@@ -6,13 +6,16 @@
 #include "QGraphicsRectItem"
 #include "QGraphicsEllipseItem"
 #include "QGraphicsLineItem"
-
+#include "QGraphicsItem"
 class ParseTree : public QWidget
 {
     Q_OBJECT
 private:
+    QVector<QGraphicsItem*>Items;
     QGraphicsScene* scene;
+    QGraphicsView* view;
 public:
+
     explicit ParseTree(QWidget *parent = nullptr);
     QGraphicsRectItem* addRectangleNode(int x,int y,QString text);
     QGraphicsEllipseItem* addEllipseNode(int x,int y,QString text);

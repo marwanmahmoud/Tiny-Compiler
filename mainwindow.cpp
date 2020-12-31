@@ -35,7 +35,8 @@ void MainWindow::init_toolbar()
     connect(ScanAction,SIGNAL(triggered(bool)),this,SLOT(start_Scan()));
     QAction * ParseAction = Toolbar->addAction("Parse");
     connect(ParseAction,SIGNAL(triggered(bool)),this,SLOT(parse()));
-
+    QAction * ClearAction = Toolbar->addAction("Clear");
+    connect(ClearAction,SIGNAL(triggered(bool)),this,SLOT(clear_tree()));
 }
 void MainWindow::init_ui()
 {
@@ -72,12 +73,19 @@ void MainWindow::browse()
     QString directory = QFileDialog::getOpenFileName(this, tr("Browsig Files"),
                                                     "QDir::currentPath()",
                                                     tr("Text (*.txt)"));
+    if(directory == "")
+    {
+        //ERROR
+        return;
+    }
+
     QString result = this->scanner->getStringFile(directory);
     Input->setPlainText(result);
 
 }
 void MainWindow::parse()
 {
+    parser.clear_parser();
     parsetree->clearTree();
     parser.setTokenIndex(0);
     parser._3bas(ScannerOutput->toPlainText());
@@ -96,4 +104,9 @@ void MainWindow::parse()
             parsetree->addEllipseNode(node.x, node.y, QString::fromStdString(node.text));
         qDebug() << QString::fromStdString(node.text) << "\n";
     }
+}
+
+void MainWindow::clear_tree(){
+    parser.clear_parser();
+    parsetree->clearTree();
 }
