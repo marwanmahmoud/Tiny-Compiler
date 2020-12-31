@@ -37,7 +37,8 @@ stmtTypes Parser::getStmtType(string s)
         return REPEAT;
     else
     {
-        cout << s << "\n";
+        cout << "ERROR FOUND "<< "\n";
+        cout << tokens[token_index].toStdString()<<"\n";
         return ERROR;
     }
 }
@@ -93,6 +94,7 @@ void  Parser::stmt()
         assign_stmt();
         break;
     case ERROR:
+
         cout << "no stmt found\n";
         //exit(1);
         break;
@@ -231,6 +233,7 @@ void  Parser::simple_exp()
         currenty +=100; //child y
         currentx += 150; //child x
         term();
+
         currenty -=100;//parent y
     }
 }
@@ -243,7 +246,6 @@ void  Parser::addop()
         Nodes.append({false,currentx,currenty,"op\n(+)"});
         post_update_edge(false);
         match("+,PLUS");
-        cout << " + -> ";
     }
     if (token == "-,MINUS")
     {
@@ -251,7 +253,6 @@ void  Parser::addop()
         Nodes.append({false,currentx,currenty,"op\n(-)"});
         post_update_edge(false);
         match("-,MINUS");
-        cout << " - -> ";
     }
 }
 
@@ -309,7 +310,6 @@ void Parser:: factor(int x,int y)
         pre_update_edge();
         Nodes.append({false,currentx,currenty,"NUMBER\n"+token.substr(0, token.find(","))});
         match(token.substr(0, token.find(",")) + ",NUMBER");
-        //Edges.push_back({false,currentx,currenty,x,y});
 
     }
     else if (token.substr(token.find(",") + 1, token.length() - token.find(",") + 1) == "IDENTIFIER")
@@ -317,7 +317,6 @@ void Parser:: factor(int x,int y)
         pre_update_edge();
         Nodes.append({false,currentx,currenty,"IDENTIFIER\n"+token.substr(0, token.find(","))});
         match(token.substr(0, token.find(",")) + ",IDENTIFIER");
-        //Edges.push_back({false,currentx,currenty,x,y});
     }
 }
 
@@ -327,7 +326,9 @@ void Parser::_3bas(QString s2)
     //s2 = input_preprocessing(s2);
     //qDebug() << s2;
     tokens = s2.split(QRegExp("\n"));
-    token =  tokens[token_index].toStdString();
+    for(int i=0;i<tokens.length();i++)
+        tokens[i].remove(" ");
+    token = tokens[token_index].toStdString();
     token_index++;
     program();
     process_edges();
@@ -338,7 +339,6 @@ QString Parser::input_preprocessing(QString s2){
 
     return s2;
 }
-
 void Parser::process_edges(){
     int len = Nodes.length();
     for(int i = 0; i < len; i++){
@@ -397,4 +397,12 @@ QVector<Edge> Parser::get_edges()
 void Parser::setTokenIndex(int x)
 {
     token_index =x;
+    currentx =0;
+    currenty =0;
+}
+
+void Parser::clear_parser()
+{
+    Edges.clear();
+    Nodes.clear();
 }

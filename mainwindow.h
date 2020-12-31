@@ -45,5 +45,6 @@ public slots:
     void start_Scan();
     void browse();
     void parse();
+    void clear_tree();
 };
 #endif // MAINWINDOW_H

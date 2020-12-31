@@ -69,6 +69,7 @@ public:
     QVector<Node> get_nodes();
     QVector<Edge> get_edges();
     void setTokenIndex(int x);
+    void clear_parser(void);
 };
 
 #endif // PARSER_H
