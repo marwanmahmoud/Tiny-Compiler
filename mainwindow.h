@@ -19,6 +19,7 @@
 #include <QFile>
 #include <QDebug>
 #include "parsetree.h"
+#include <QMessageBox>
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -36,6 +37,8 @@ private:
     QPushButton *BrowseButton ;
     Parser parser;
     ParseTree *parsetree;
+    QMessageBox* msgBox;
+
 public:
     MainWindow(QWidget *parent = nullptr);
     void init_toolbar(void);

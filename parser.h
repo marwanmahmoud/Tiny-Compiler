@@ -30,6 +30,7 @@ typedef struct{
 class Parser
 {
 private:
+    int error=0;
     QStringList tokens;
     int token_index=0;
     string token;
@@ -63,7 +64,7 @@ public:
     void factor(int x,int y);
     void pre_update_edge();
     void post_update_edge(bool isFriend);
-    void _3bas(QString s2);
+    int _3bas(QString s2);
     void process_edges();
     QString input_preprocessing(QString s2);
     QVector<Node> get_nodes();
