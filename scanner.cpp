@@ -71,7 +71,7 @@ QString Scanner::getToken(string l)
                     result +="),CLOSEDBRACKET\n";
                     break;
                 case '+':
-                     result +="+,ADD\n";
+                     result +="+,PLUS\n";
                     break;
                 case '-':
                      result +="-,MINUS\n";

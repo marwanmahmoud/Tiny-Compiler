@@ -21,6 +21,21 @@ QString Parser::getStringFile(QString directory)
     }
     return (input);
 }
+int Parser::_3bas(QString s2)
+{
+    //s2 = getStringFile("/home/mogz/Desktop/Tiny-Compiler/parser_input.txt");//media/sf_C_DRIVE/Users/moham/QT/Tiny-Compiler/parser_input.txt
+    //s2 = input_preprocessing(s2);
+    //qDebug() << s2;
+    tokens = s2.split(QRegExp("\n"));
+    for(int i=0;i<tokens.length();i++)
+        tokens[i].remove(" ");
+    token = tokens[token_index].toStdString();
+    token_index++;
+    program();
+    process_edges();
+    //file.close();
+    return error;
+}
 stmtTypes Parser::getStmtType(string s)
 {
     s = s.substr(s.find(",") + 1, s.length() - s.find(",")+1);
@@ -37,7 +52,7 @@ stmtTypes Parser::getStmtType(string s)
         return REPEAT;
     else
     {
-        cout << "ERROR FOUND "<< "\n";
+
         cout << tokens[token_index].toStdString()<<"\n";
         return ERROR;
     }
@@ -51,8 +66,8 @@ void  Parser::match(string s)
     }
     else
     {
-        cout << endl
-             << "-- Program not found" << endl;
+        error=2;
+        cout << endl << "-- Program not found" << endl;
         //exit(1);
     }
 }
@@ -60,8 +75,7 @@ void  Parser::match(string s)
 void  Parser::program()
 {
     stmt_seq();
-    cout << endl
-         << "-- Program found" << endl;
+    cout << endl << "-- Program found" << endl;
 }
 // stmt-seq -> stmt {; stmt}
 void  Parser::stmt_seq()
@@ -76,6 +90,7 @@ void  Parser::stmt_seq()
 // stmt -> if-stmt | repeat-stmt | assign-stmt | read-stmt | write-stmt
 void  Parser::stmt()
 {
+    cout << "1-" << token <<"\n" ;
     switch (getStmtType(token))
     {
     case READ:
@@ -91,9 +106,11 @@ void  Parser::stmt()
         repeat_stmt();
         break;
     case ASSIGN:
+        cout << "2-" << token <<"\n" ;
         assign_stmt();
         break;
     case ERROR:
+        error =1;
         cout << "no stmt found\n";
         //exit(1);
         break;
@@ -148,13 +165,17 @@ void  Parser::repeat_stmt()
 // assign-stmt -> identifier := exp
 void  Parser::assign_stmt()
 {
+
     pre_update_edge();
     Nodes.append({true,currentx,currenty,"assign\n   "+token.substr(0, token.find(","))});
     post_update_edge(false);
     match(token.substr(0, token.find(",")) + ",IDENTIFIER");
+    cout << "3-" << token <<"\n" ;
     match(":=,ASSIGN");
+    cout << "4-" << token <<"\n" ;
     currenty +=100;//child y
     exp();
+    cout << "-" << token <<"\n" ;
     currenty -=100;//parent y
     currentx +=150;//friend x;
 }
@@ -185,7 +206,8 @@ void  Parser::write_stmt()
 }
 // exp -> simple-exp [comparison-op simple-exp]
 void  Parser::exp()
-{    
+{
+    cout << "6-" << token <<"\n" ;
     if(tokens[token_index] == "<,LESSTHAN" || tokens[token_index] == "=,EQUAL")
        currenty+=100;
     simple_exp();
@@ -224,13 +246,17 @@ void  Parser::simple_exp()
 {
     if(tokens[token_index] == "+,PLUS"  || tokens[token_index] =="-,MINUS")
        currenty+=100;
+    cout << "7-" << token <<"\n" ;
     term();
     while (token == "+,PLUS" || token == "-,MINUS")
     {
+        cout << "8-" << token <<"\n" ;
         currenty -= 100; //parenty
         addop();
+        cout << "10-" << token <<"\n" ;
         currenty +=100; //child y
         currentx += 150; //child x
+        cout << "9-" << token <<"\n" ;
         term();
 
         currenty -=100;//parent y
@@ -290,7 +316,6 @@ void  Parser::mulop()
         Nodes.append({false,currentx,currenty,"op\n(/)"});
         post_update_edge(false);
         match("/,DIV");
-        cout << " / -> ";
     }
 }
 
@@ -298,8 +323,9 @@ void  Parser::mulop()
 void Parser:: factor(int x,int y)
 {
 
-    if (token == "(")
+    if (token == "(,OPENBRACKET")
     {
+        cout << "12- " << token << "\n" ;
         match("(,OPENBRACKET");
         exp();
         match("),CLOSEDBRACKET");
@@ -319,20 +345,6 @@ void Parser:: factor(int x,int y)
     }
 }
 
-void Parser::_3bas(QString s2)
-{
-    //s2 = getStringFile("/home/mogz/Desktop/Tiny-Compiler/parser_input.txt");//media/sf_C_DRIVE/Users/moham/QT/Tiny-Compiler/parser_input.txt
-    //s2 = input_preprocessing(s2);
-    //qDebug() << s2;
-    tokens = s2.split(QRegExp("\n"));
-    for(int i=0;i<tokens.length();i++)
-        tokens[i].remove(" ");
-    token = tokens[token_index].toStdString();
-    token_index++;
-    program();
-    process_edges();
-    //file.close();
-}
 
 QString Parser::input_preprocessing(QString s2){
 

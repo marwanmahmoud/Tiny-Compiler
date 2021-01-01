@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
     scanner = new Scanner();
     parser = Parser();
     parsetree =new ParseTree();
-
+    msgBox = new QMessageBox;
     //BrowseButton = new QPushButton(tr("Browse"), this);
     //ScannerOutput->setReadOnly(true);
     ui->setupUi(this);
@@ -66,6 +66,8 @@ void MainWindow::start_Scan()
 {
     QString result = this->scanner->getToken(Input->toPlainText().toStdString());
     qDebug()<<result;
+    if(result == "")
+       QMessageBox::warning(this, tr("Nothing to Scan"),tr("Please Enter A Text To Scan.\n"),QMessageBox::Cancel);
     ScannerOutput->setPlainText(result);
 }
 void MainWindow::browse()
@@ -75,7 +77,7 @@ void MainWindow::browse()
                                                     tr("Text (*.txt)"));
     if(directory == "")
     {
-        //ERROR
+        QMessageBox::warning(this, tr("Nothing to Scan"),tr("Please Enter A Text To Scan.\n"),QMessageBox::Cancel);
         return;
     }
 
@@ -85,10 +87,19 @@ void MainWindow::browse()
 }
 void MainWindow::parse()
 {
+    int error;
     parser.clear_parser();
     parsetree->clearTree();
     parser.setTokenIndex(0);
-    parser._3bas(ScannerOutput->toPlainText());
+    error = parser._3bas(ScannerOutput->toPlainText());
+    if(error !=0)
+    {
+        if(error == 1)
+            QMessageBox::critical(this, tr("Statment Type Not Define"),tr("Please Enter Correct Statment.\n"),QMessageBox::Cancel);
+        else if(error ==2)
+            QMessageBox::critical(this, tr("Unexpected Token"),tr("Please Make Sure That You Entered A Correct Formate.\n"),QMessageBox::Cancel);
+        return;
+    }
     QVector<Node> nodes = parser.get_nodes();
     QVector<Edge> edges = parser.get_edges();
     for(auto edge: edges){
